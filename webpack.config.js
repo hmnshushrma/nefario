@@ -5,8 +5,10 @@ const HtmlWebPackPlugin = require('html-webpack-plugin')
 const rootDir = path.resolve(__dirname, '.')
 const srcDir = path.resolve(__dirname, '.', 'src')
 const distDir = path.resolve(__dirname, '.', 'dist')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const devMode = process.env.NODE_ENV !== 'production'
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const cssnano = require('cssnano')
+const TerserJSPlugin = require('terser-webpack-plugin')
 
 module.exports = () => {
   const env = dotenv.config().parsed
@@ -16,7 +18,7 @@ module.exports = () => {
   }, {})
   return {
     context: rootDir,
-    entry: './src/index.js',
+    entry: path.join(__dirname, 'src', 'index.js'),
     output: {
       path: distDir,
       publicPath: '/',
@@ -28,9 +30,6 @@ module.exports = () => {
       historyApiFallback: true,
       hot: true,
       open: true
-      // needed for phone testing
-      // host:'0.0.0.0',
-      // port:'8080'
     },
     devtool: 'cheap-module-source-map',
     resolve: {
@@ -38,12 +37,9 @@ module.exports = () => {
       alias: {
         Styles: path.resolve(__dirname, 'src/styles/'),
         Assets: path.resolve(__dirname, 'src/assets/'),
-        Redux: path.resolve(__dirname, 'src/redux/'),
         Views: path.resolve(__dirname, 'src/views/'),
-        Hoc: path.resolve(__dirname, 'src/hoc/'),
-        Routes: path.resolve(__dirname, 'src/routes/'),
-        FormConstants: path.resolve(__dirname, 'src/FormConstants/'),
-        Util: path.resolve(__dirname, 'src/util/')
+        Util: path.resolve(__dirname, 'src/utils/'),
+        Constants: path.resolve(__dirname, 'src/constants/')
       }
     },
     module: {
@@ -59,46 +55,20 @@ module.exports = () => {
           loader: 'url-loader'
         },
         {
-          test: /\.(scss)$/,
+          test: /\.s?[ac]ss$/,
           use: [
-            {
-              loader: 'style-loader'
-            },
-            {
-              loader: 'css-loader',
-              options: {
-                sourceMap: true
-              }
-            },
-            {
-              loader: 'sass-loader',
-              options: {
-                sourceMap: true
-              }
-            }
-          ]
-        },
-        {
-          test: /\.(css)$/,
-          use: [
-            {
-              loader: 'style-loader'
-            },
-            {
-              loader: 'css-loader',
-              options: {
-                sourceMap: true
-              }
-            }
+            MiniCssExtractPlugin.loader,
+            { loader: 'css-loader', options: { url: false, sourceMap: true } },
+            { loader: 'sass-loader', options: { sourceMap: true } }
           ]
         }
       ]
     },
     optimization: {
-      minimize: true,
       minimizer: [
+        new TerserJSPlugin({}),
         new OptimizeCSSAssetsPlugin({
-          cssProcessor: cssnano,
+          cssProcessor: require('cssnano'),
           cssProcessorOptions: {
             discardComments: {
               removeAll: true
@@ -107,35 +77,12 @@ module.exports = () => {
           },
           canPrint: false
         })
-      ],
-      splitChunks: {
-        minSize: 30000,
-        maxSize: 0,
-        minChunks: 1,
-        automaticNameDelimiter: '~',
-        name: true,
-        cacheGroups: {
-          default: false,
-          vendors: false,
-          vendors: {
-            chunks: 'all',
-            test: /[\\/]node_modules[\\/]/,
-            priority: -10
-          },
-          common: {
-            chunks: 'async',
-            minChunks: 2,
-            name: 'common',
-            priority: -20,
-            reuseExistingChunk: true
-          }
-        }
-      }
+      ]
     },
     plugins: [
       new HtmlWebPackPlugin({
         // where to find the html template
-        template: path.resolve(__dirname, 'index.html'),
+        template: path.resolve(__dirname, 'src/public/index.html'),
         // where to put the generated file
         path: distDir,
         // the output file name
@@ -145,7 +92,11 @@ module.exports = () => {
           js: ['bundle.js']
         }
       }),
-      new webpack.DefinePlugin(envKeys)
-    ]
+      new webpack.DefinePlugin(envKeys),
+      new MiniCssExtractPlugin({
+        filename: '[hash].css'
+      })
+    ],
+    mode: devMode ? 'development' : 'production'
   }
 }

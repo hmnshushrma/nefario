@@ -1,0 +1,11 @@
+.product-container {
+  height: 100vh;
+  overflow-y: scroll;
+  .product-category-heading {
+    font-size: 28px;
+    font-weight: 600;
+    text-transform: capitalize;
+    color: #e46d47;
+    margin:30px 0px 0px 24px;
+  }
+}

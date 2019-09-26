@@ -1,11 +1,8 @@
 @import "colors";
-
-.heading{
-  color: $textColor1;
-  p{
-    color:$primaryCTA;
-    span{
-      color: $alert;
-    }
-  }
+body{
+  margin:0px;
+}
+.base-container{
+  display: flex;
+  font-family: $font-family-roboto;
 }

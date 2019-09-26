@@ -1,0 +1,70 @@
+@import "./colors.scss";
+
+.cards {
+    display: inline-block;
+    width: 30%;
+    margin:15px;
+    vertical-align: top;
+    border: 1px solid white;
+    .product{
+        &-image {
+            position: relative;
+            width: 23.5vw;
+            height: 15vw;
+            overflow: hidden;
+            margin:0 auto;
+            margin-top: 8px;
+            .item-image {
+                width: 100%;
+            }
+        }
+        &-desc{
+            padding:10px;
+            p{
+                margin:0px;
+            }
+            .basic-details{
+                display: flex;
+                justify-content: space-between;
+                font-size: 12px;
+                margin: 10px 0px;
+            }
+            .price{
+                margin:2px 0px 0px 0px;
+            }
+            .food-type{
+                font-size: 12px;
+            }
+            .rest{
+                padding: 5px;
+                color: $white;
+                border-radius:5px;
+                &-name{
+                    font-size: 17px;
+                    font-weight: 500;
+                    word-break: break-word;
+                }
+                &.ratings{
+                    &-0{
+                        color: $blackPrimary;
+                    }
+                    &-1, &-2, &-3{
+                        background: $ratingbad;
+                    }
+                    &-4, &-5{
+                        background: $ratinggood;
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+
+    &:hover{
+        border: #d3d5df solid 1px;
+        box-shadow: 0 4px 7px 0 rgba(218,220,230,.6);
+    }
+}
